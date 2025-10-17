@@ -1,0 +1,10 @@
+# Ignorar ambiente virtual
+.venv/
+
+# Ignorar caches e arquivos temporários
+__pycache__/
+*.pyc
+
+# Credenciais do Atlas do MongoDB
+.cred
+.env

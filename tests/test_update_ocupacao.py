@@ -1,0 +1,45 @@
+import pytest
+from unittest.mock import patch, MagicMock
+from api import app
+
+@pytest.fixture
+def client():
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
+
+@patch("api.connect_db") # aqui mockamos o connect_db criado dentro do arquivos para fingir que fazemos uma conexao
+def test_update_aquario(mock_connect_db, client):
+    # aqui teremos o mock do banco que vamos puxar e em seguida o mock da collection que vamos puxar tambem. fazemos dassa forma pois quando fizermos um find na collection nn fazemos um find no mock e sim um novo mock pra retornar as informações que queremos 
+    mock_db = MagicMock()
+    mock_collection = MagicMock() 
+    
+		# essa estrutura diz que quando fizermos colection['algumacoisa'] ele vai retornar o colection que ja checamos 
+    mock_db.__getitem__.return_value = mock_collection 
+    
+    # essa outra estrutura diz que qunado chamarmos o connect_db nos retornamos o nosso mock criado 
+    mock_connect_db.return_value = mock_db
+    
+    # na funcao nos vamos ter que verificar qual o estado para mudar então presisamos mokar isso tambem
+    mock_collection.find_one.return_value = {
+        "andar": 1,
+        "capacidade_cadeiras": 10,
+        "id": 1,
+        "id_local": 1,
+        "ocupado": True,
+        "predio": "predio_1"
+    }    
+		# quando realizamos um update no mongo ele nos retorna varias informacoes entre elas, se o documento foi encontrado (matched_count = 1), se ele foi realmente alterado (modified_count = 1) e se nenhum outro documento novo foi criado (upserted_id = None). Portanto quando vamos fazer uma verificação temos que mokar essas informações 
+        
+    mock_update_result = MagicMock()
+    mock_update_result.matched_count = 1
+    mock_update_result.modified_count = 1
+    mock_update_result.upserted_id = None		
+    
+
+    mock_collection.update_one.return_value = mock_update_result
+
+		# realizamos a requisição que queremos testar mockando as operações que abordamos anteriormente aqui 
+    response = client.put("/aquarios/1/update_ocupacao")
+		
+    assert response.status_code == 200

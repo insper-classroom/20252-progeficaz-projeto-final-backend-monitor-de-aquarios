@@ -77,7 +77,5 @@ def get_aquarios_disponiveis():
 
     except Exception as e:
         return {"erro": "erro ao encontrar aquarios livres {e}"},500
-        
-    
 if __name__ == '__main__':
     app.run(debug=True)

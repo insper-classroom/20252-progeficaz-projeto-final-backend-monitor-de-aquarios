@@ -9,7 +9,7 @@ def client():
         yield client
 
 @patch("api.connect_db") # aqui mockamos o connect_db criado dentro do arquivos para fingir que fazemos uma conexao
-def test_get_aquario(mock_connect_db, client):
+def test_update_aquario(mock_connect_db, client):
     # aqui teremos o mock do banco que vamos puxar e em seguida o mock da collection que vamos puxar tambem. fazemos dassa forma pois quando fizermos um find na collection nn fazemos um find no mock e sim um novo mock pra retornar as informações que queremos 
     mock_db = MagicMock()
     mock_collection = MagicMock() 

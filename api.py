@@ -77,5 +77,29 @@ def get_aquarios_disponiveis():
 
     except Exception as e:
         return {"erro": "erro ao encontrar aquarios livres {e}"},500
+    
+@app.route('/aquarios/<int:id>/update_ocupacao', methods = ['PUT'])
+
+def update_ocupacao(id):
+    db = connect_db()
+    if db is None:
+      return {"erro": "Erro ao conectar ao banco de dados"}, 500
+    try:
+        collection = db['aquarios']
+        aquario = collection.find_one({"id":id}, {"_id": 0})  # procuramos o aquario 
+        
+				# se ele estiver ocupado trocamos para false e se estiver livre trocamos pra true 
+        if aquario['ocupado'] == True:
+            collection.update_one({"id" : id}, {"$set":{"ocupado": False}})
+            return {'mensagem':'estado de ocupacao alterado'},200
+        elif aquario['ocupado'] == False:
+            collection.update_one({"id" : id}, {"$set":{"ocupado": True}})
+            return {'mensagem':'estado de ocupacao alterado'},200            
+        if not aquario:
+            return {'mensagem':'nenhum aquario encontrado'}, 404
+        
+    except Exception as e:
+        return {"erro": "erro ao atualizar ocupação do aquario {e}"},500    
+    
 if __name__ == '__main__':
     app.run(debug=True)

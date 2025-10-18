@@ -59,7 +59,25 @@ def get_aquario(id_aquario):
         return {"erro": f"erro ao encontrar aquario {e}"},500
         
         
-          
+@app.route('/aquarios/disponiveis', methods=['GET'])
+
+def get_aquarios_disponiveis():
+    db = connect_db()
+    if db is None:
+      return {"erro": "Erro ao conectar ao banco de dados"}, 500
+    
+    try:
+        collection = db['aquarios']
+        aquarios_cursor = collection.find({"ocupado" : False}, {"_id": 0})  #procura todos os aquarios que tem false na categoria ocupado
+        if not aquarios_cursor:
+            return {'mensagem':'nenhum aquario livre'}, 404
+        else:
+            return {'aquarios':aquarios_cursor}, 200
+        
+
+    except Exception as e:
+        return {"erro": "erro ao encontrar aquarios livres {e}"},500
+        
     
 if __name__ == '__main__':
     app.run(debug=True)

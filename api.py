@@ -3,6 +3,15 @@ import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
+
+# ==========================================Funções implementadas nessa api ==================================================
+
+# - connect_db(): conecta ao banco MongoDB e retorna o objeto db.
+# - get_aquarios(): retorna todos os aquários cadastrados.
+# - get_aquario(id_aquario): retorna um aquário específico pelo ID.
+# - get_aquarios_disponiveis(): lista apenas os aquários desocupados.
+# - update_ocupacao(id): alterna o estado de ocupação (True/False) de um aquário.
+
 load_dotenv('.cred') # aqui carregamos o arquivo .cred temporariamente na sessão
 
 mongo_uri = os.getenv('MONGO_URI')  #leitura das credenciais do banco 

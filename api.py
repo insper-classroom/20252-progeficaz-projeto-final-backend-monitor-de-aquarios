@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 # - get_aquario(id_aquario): retorna um aquário específico pelo ID.
 # - get_aquarios_disponiveis(): lista apenas os aquários desocupados.
 # - update_ocupacao(id): alterna o estado de ocupação (True/False) de um aquário.
+# - filter() : filtra os aquarios com base no arg da request 
 
 load_dotenv('.cred') # aqui carregamos o arquivo .cred temporariamente na sessão
 
@@ -109,6 +110,46 @@ def update_ocupacao(id):
         
     except Exception as e:
         return {"erro": "erro ao atualizar ocupação do aquario {e}"},500    
-    
+
+
+
+@app.route('/aquarios/filter', methods = ['GET']) #passo os filtros por meio de parametros
+def filter():
+    db = connect_db()
+    if db is None:
+        return {"Erro":"Erro ao conectar com o banco de dados"}
+    else:
+        collection = db['aquarios']
+        predio = request.args.get("predio")# recebo os parametros aqui
+        andar = request.args.get("andar")
+        capacidades_cadeiras = request.args.get("capacidade_cadeiras")
+        ocupado = request.args.get("ocupado")
+        
+        filtros = {}#coloco todos os parametros nesse dicionario caso venham 
+        if predio and predio != "None":
+            filtros["predio"]= str(predio)
+            
+        if andar and andar != "None":
+            filtros["andar"]= int(andar)
+            
+        if capacidades_cadeiras and capacidades_cadeiras != "None":
+            filtros["capacidade_cadeiras"]= int(capacidades_cadeiras)
+            
+        if ocupado and ocupado != "None":
+            filtros["ocupado"]= bool(ocupado)
+        
+        try:
+            aquarios_cursor = collection.find(filtros, {"_id": 0})# uso aquele dicionario para estipular os filtros
+            aquarios = list(aquarios_cursor)# transformo o cursor em lista para puder passar em json
+            if not aquarios:
+                return {"erro": "Nenhum aquário encontrado"}, 404
+
+            return {"aquarios": aquarios}, 200
+
+        except Exception as e:
+            return {"erro": f"Erro ao consultar aquários: {str(e)}"}, 500
+
+
+            
 if __name__ == '__main__':
     app.run(debug=True)

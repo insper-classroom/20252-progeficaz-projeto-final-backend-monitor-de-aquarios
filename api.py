@@ -82,11 +82,11 @@ def update_ocupacao(id):
         aquario = collection.find_one({"id":id}, {"_id": 0})  # procuramos o aquario 
         
 				# se ele estiver ocupado trocamos para false e se estiver livre trocamos pra true 
-        if aquario['ocupado'] == True:
-            collection.update_one({"id" : id}, {"$set":{"ocupado": False}})
+        if aquario['ocupacao'] == True:
+            collection.update_one({"id" : id}, {"$set":{"ocupacao": False}})
             return {'mensagem':'estado de ocupacao alterado'},200
-        elif aquario['ocupado'] == False:
-            collection.update_one({"id" : id}, {"$set":{"ocupado": True}})
+        elif aquario['ocupacao'] == False:
+            collection.update_one({"id" : id}, {"$set":{"ocupacao": True}})
             return {'mensagem':'estado de ocupacao alterado'},200            
         if not aquario:
             return {'mensagem':'nenhum aquario encontrado'}, 404

@@ -1,0 +1,4 @@
+flask
+pymongo
+dotenv
+pytest

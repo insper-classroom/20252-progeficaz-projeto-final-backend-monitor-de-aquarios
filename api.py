@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -12,6 +13,7 @@ from dotenv import load_dotenv
 # - get_aquarios_disponiveis(): lista apenas os aquários desocupados.
 # - update_ocupacao(id): alterna o estado de ocupação (True/False) de um aquário.
 # - filter() : filtra os aquarios com base no arg da request 
+
 
 load_dotenv('.cred') # aqui carregamos o arquivo .cred temporariamente na sessão
 
@@ -30,6 +32,7 @@ def connect_db():
 
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/aquarios', methods=['GET'])
 def get_aquarios():

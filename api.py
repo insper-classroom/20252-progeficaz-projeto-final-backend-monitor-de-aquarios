@@ -91,7 +91,7 @@ def get_aquarios_disponiveis():
     except Exception as e:
         return {"erro": "erro ao encontrar aquarios livres {e}"},500
     
-@app.route('/aquarios/<int:id>/update_ocupacao', methods = ['PUT'])
+@app.route('/aquarios/<int:id>', methods = ['PUT'])
 
 def update_ocupacao(id):
     db = connect_db()

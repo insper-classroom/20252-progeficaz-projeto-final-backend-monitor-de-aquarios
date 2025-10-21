@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 # - connect_db(): conecta ao banco MongoDB e retorna o objeto db.
 # - get_aquarios(): retorna todos os aquários cadastrados.
 # - get_aquario(id_aquario): retorna um aquário específico pelo ID.
-# - get_aquarios_disponiveis(): lista apenas os aquários desocupados.
 # - update_ocupacao(id): alterna o estado de ocupação (True/False) de um aquário.
 # - filter() : filtra os aquarios com base no arg da request 
 
@@ -70,26 +69,6 @@ def get_aquario(id_aquario):
 
     except Exception as e:
         return {"erro": f"erro ao encontrar aquario {e}"},500
-        
-        
-@app.route('/aquarios/disponiveis', methods=['GET'])
-
-def get_aquarios_disponiveis():
-    db = connect_db()
-    if db is None:
-      return {"erro": "Erro ao conectar ao banco de dados"}, 500
-    
-    try:
-        collection = db['aquarios']
-        aquarios_cursor = collection.find({"ocupado" : False}, {"_id": 0})  #procura todos os aquarios que tem false na categoria ocupado
-        if not aquarios_cursor:
-            return {'mensagem':'nenhum aquario livre'}, 404
-        else:
-            return {'aquarios':aquarios_cursor}, 200
-        
-
-    except Exception as e:
-        return {"erro": "erro ao encontrar aquarios livres {e}"},500
     
 @app.route('/aquarios/<int:id>', methods = ['PUT'])
 
@@ -102,11 +81,11 @@ def update_ocupacao(id):
         aquario = collection.find_one({"id":id}, {"_id": 0})  # procuramos o aquario 
         
 				# se ele estiver ocupado trocamos para false e se estiver livre trocamos pra true 
-        if aquario['ocupado'] == True:
-            collection.update_one({"id" : id}, {"$set":{"ocupado": False}})
+        if aquario['ocupacao'] == True:
+            collection.update_one({"id" : id}, {"$set":{"ocupacao": False}})
             return {'mensagem':'estado de ocupacao alterado'},200
-        elif aquario['ocupado'] == False:
-            collection.update_one({"id" : id}, {"$set":{"ocupado": True}})
+        elif aquario['ocupacao'] == False:
+            collection.update_one({"id" : id}, {"$set":{"ocupacao": True}})
             return {'mensagem':'estado de ocupacao alterado'},200            
         if not aquario:
             return {'mensagem':'nenhum aquario encontrado'}, 404
@@ -125,8 +104,8 @@ def filter():
         collection = db['aquarios']
         predio = request.args.get("predio")# recebo os parametros aqui
         andar = request.args.get("andar")
-        capacidades_cadeiras = request.args.get("capacidade_cadeiras")
-        ocupado = request.args.get("ocupado")
+        capacidade = request.args.get("capacidade")
+        ocupacao = request.args.get("ocupacao")
         
         filtros = {}#coloco todos os parametros nesse dicionario caso venham 
         if predio and predio != "None":
@@ -135,17 +114,20 @@ def filter():
         if andar and andar != "None":
             filtros["andar"]= int(andar)
             
-        if capacidades_cadeiras and capacidades_cadeiras != "None":
-            filtros["capacidade_cadeiras"]= int(capacidades_cadeiras)
+        if capacidade and capacidade != "None":
+            filtros["capacidade"]= int(capacidade)
             
-        if ocupado and ocupado != "None":
-            filtros["ocupado"]= bool(ocupado)
+        if ocupacao and ocupacao != "None":
+            filtros["ocupacao"]= bool(ocupacao)
         
         try:
             aquarios_cursor = collection.find(filtros, {"_id": 0})# uso aquele dicionario para estipular os filtros
             aquarios = list(aquarios_cursor)# transformo o cursor em lista para puder passar em json
             if not aquarios:
                 return {"erro": "Nenhum aquário encontrado"}, 404
+            
+            if andar and andar != "None" and (predio == 'None' or not predio):
+                return {"erro": "Selecione um prédio"}, 500
 
             return {"aquarios": aquarios}, 200
 

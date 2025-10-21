@@ -1,0 +1,278 @@
+{
+    "aquarios": [
+        {
+            "id": 1,
+            "nome": "Aquário 1",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 2,
+            "nome": "Aquário 2",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 3,
+            "nome": "Aquário 3",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 10,
+            "ocupacao": false
+        },{
+            "id": 4,
+            "nome": "Aquário 4",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 5,
+            "nome": "Aquário 5",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 6,
+            "nome": "Aquário 6",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 7,
+            "nome": "Aquário 7",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 8,
+            "nome": "Aquário 8",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 9,
+            "nome": "Aquário 9",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 10,
+            "nome": "Aquário 10",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 11,
+            "nome": "Aquário 11",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 12,
+            "nome": "Aquário 12",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 6,
+            "ocupacao": false
+        },{
+            "id": 13,
+            "nome": "Aquário 13",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 14,
+            "nome": "Aquário 14",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 15,
+            "nome": "Aquário 15",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 6,
+            "ocupacao": false
+        },{
+            "id": 16,
+            "nome": "Aquário 16",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 17,
+            "nome": "Aquário 17",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 18,
+            "nome": "Aquário 18",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 6,
+            "ocupacao": false
+        },{
+            "id": 19,
+            "nome": "Aquário 19",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 20,
+            "nome": "Aquário 20",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 21,
+            "nome": "Aquário 21",
+            "andar": 0,
+            "predio": "Prédio Cláudio Haddad",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 22,
+            "nome": "Aquário 1",
+            "andar": 2,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 23,
+            "nome": "Aquário 2",
+            "andar": 2,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 24,
+            "nome": "Aquário 3",
+            "andar": 2,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 25,
+            "nome": "Aquário 4",
+            "andar": 2,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 26,
+            "nome": "Aquário 5",
+            "andar": 2,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 27,
+            "nome": "Aquário 6",
+            "andar": 2,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 28,
+            "nome": "Aquário 1",
+            "andar": 5,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 29,
+            "nome": "Aquário 2",
+            "andar": 5,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 30,
+            "nome": "Aquário 3",
+            "andar": 5,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 31,
+            "nome": "Aquário 4",
+            "andar": 5,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 32,
+            "nome": "Aquário 5",
+            "andar": 5,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 8,
+            "ocupacao": false
+        },{
+            "id": 33,
+            "nome": "Aquário 6",
+            "andar": 5,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 34,
+            "nome": "Aquário 7",
+            "andar": 5,
+            "predio": "Prédio Quatá 200",
+            "capacidade": 5,
+            "ocupacao": false
+        },{
+            "id": 35,
+            "nome": "Sala de Estudo 1",
+            "andar": 1,
+            "predio": "Prédio Quatá 67",
+            "capacidade": 6,
+            "ocupacao": false
+        },{
+            "id": 36,
+            "nome": "Sala de Estudo 2",
+            "andar": 1,
+            "predio": "Prédio Quatá 67",
+            "capacidade": 6,
+            "ocupacao": false
+        },{
+            "id": 37,
+            "nome": "Sala de Estudo 3",
+            "andar": 1,
+            "predio": "Prédio Quatá 67",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 38,
+            "nome": "Sala de Estudo 4",
+            "andar": 1,
+            "predio": "Prédio Quatá 67",
+            "capacidade": 4,
+            "ocupacao": false
+        },{
+            "id": 39,
+            "nome": "Sala de Estudo 5",
+            "andar": 1,
+            "predio": "Prédio Quatá 67",
+            "capacidade": 4,
+            "ocupacao": false
+        }
+    ]
+}

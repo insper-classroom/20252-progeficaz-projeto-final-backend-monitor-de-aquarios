@@ -62,6 +62,28 @@ def register():
 
     return {"mensagem": "Usuário cadastrado com sucesso"}, 201
 
+@app.route('/login', methods=['POST'])
+def login():
+    db = connect_db()
+    if db is None:
+        return {"erro": "Erro ao conectar ao banco de dados"}, 500
+
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return {"erro": "Usuário e senha são obrigatórios"}, 400
+
+    collection = db['users']
+    user = collection.find_one({"username": username})
+
+    if not user or not bcrypt.check_password_hash(user['password'], password):
+        return {"erro": "Usuário ou senha inválidos"}, 401
+
+    access_token = create_access_token(identity=username)
+    return {"access_token": access_token}, 200
+
 @app.route('/aquarios', methods=['GET'])
 def get_aquarios():
     db = connect_db()

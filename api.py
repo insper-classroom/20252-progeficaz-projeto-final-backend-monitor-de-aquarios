@@ -104,8 +104,8 @@ def filter():
         collection = db['aquarios']
         predio = request.args.get("predio")# recebo os parametros aqui
         andar = request.args.get("andar")
-        capacidade = request.args.get("capacidade")
-        ocupacao = request.args.get("ocupacao")
+        capacidade = request.args.get("capacidade_cadeiras")
+        ocupado = request.args.get("ocupado")
         
         filtros = {}#coloco todos os parametros nesse dicionario caso venham 
         if predio and predio != "None":
@@ -115,11 +115,16 @@ def filter():
             filtros["andar"]= int(andar)
             
         if capacidade and capacidade != "None":
-            filtros["capacidade"]= int(capacidade)
+            filtros["capacidade_cadeiras"]= int(capacidade)
             
-        if ocupacao and ocupacao != "None":
-            filtros["ocupacao"]= bool(ocupacao)
-        
+        if ocupado and ocupado != "None":
+            ocupado = ocupado.strip().lower()
+            if ocupado =="true":
+                filtros["ocupado"] =True
+            elif ocupado == "false":
+                filtros["ocupado"]=False
+                
+            
         try:
             aquarios_cursor = collection.find(filtros, {"_id": 0})# uso aquele dicionario para estipular os filtros
             aquarios = list(aquarios_cursor)# transformo o cursor em lista para puder passar em json

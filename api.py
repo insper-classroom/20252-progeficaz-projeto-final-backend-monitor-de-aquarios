@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 # - filter() : filtra os aquarios com base no arg da request 
 
 
-load_dotenv('.cred') # aqui carregamos o arquivo .cred temporariamente na sessão
+load_dotenv('cred') # aqui carregamos o arquivo .cred temporariamente na sessão
 
 mongo_uri = os.getenv('MONGO_URI')  #leitura das credenciais do banco 
 db_name = os.getenv('DB_NAME')
@@ -155,8 +155,8 @@ def filter():
         collection = db['aquarios']
         predio = request.args.get("predio")# recebo os parametros aqui
         andar = request.args.get("andar")
-        capacidade = request.args.get("capacidade_cadeiras")
-        ocupado = request.args.get("ocupado")
+        capacidade = request.args.get("capacidade")
+        ocupado = request.args.get("ocupacao")
         
         filtros = {}#coloco todos os parametros nesse dicionario caso venham 
         if predio and predio != "None":
@@ -166,14 +166,14 @@ def filter():
             filtros["andar"]= int(andar)
             
         if capacidade and capacidade != "None":
-            filtros["capacidade_cadeiras"]= int(capacidade)
+            filtros["capacidade"]= int(capacidade)
             
         if ocupado and ocupado != "None":
             ocupado = ocupado.strip().lower()
             if ocupado =="true":
-                filtros["ocupado"] =True
+                filtros["ocupacao"] =True
             elif ocupado == "false":
-                filtros["ocupado"]=False
+                filtros["ocupacao"]=False
                 
             
         try:

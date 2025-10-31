@@ -1,5 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import (
+    JWTManager, create_access_token, jwt_required, get_jwt_identity
+)
+from flask_bcrypt import Bcrypt
 import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -32,6 +36,53 @@ def connect_db():
 
 app = Flask(__name__)
 CORS(app)
+bcrypt = Bcrypt(app)
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+jwt = JWTManager(app)
+
+@app.route('/cadastro', methods=['POST'])
+def register():
+    db = connect_db()
+    if db is None:
+        return {"erro": "Erro ao conectar ao banco de dados"}, 500
+
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return {"erro": "Usuário e senha são obrigatórios"}, 400
+
+    collection = db['users']
+    if collection.find_one({"username": username}):
+        return {"erro": "Usuário já existe"}, 400
+
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    collection.insert_one({"username": username, "password": hashed_password})
+
+    return {"mensagem": "Usuário cadastrado com sucesso"}, 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    db = connect_db()
+    if db is None:
+        return {"erro": "Erro ao conectar ao banco de dados"}, 500
+
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return {"erro": "Usuário e senha são obrigatórios"}, 400
+
+    collection = db['users']
+    user = collection.find_one({"username": username})
+
+    if not user or not bcrypt.check_password_hash(user['password'], password):
+        return {"erro": "Usuário ou senha inválidos"}, 401
+
+    access_token = create_access_token(identity=username)
+    return {"access_token": access_token}, 200
 
 @app.route('/aquarios', methods=['GET'])
 def get_aquarios():

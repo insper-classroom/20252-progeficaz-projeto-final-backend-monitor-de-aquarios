@@ -180,7 +180,7 @@ def filter():
             aquarios_cursor = collection.find(filtros, {"_id": 0})# uso aquele dicionario para estipular os filtros
             aquarios = list(aquarios_cursor)# transformo o cursor em lista para puder passar em json
             if not aquarios:
-                return {"erro": "Nenhum aquário encontrado"}, 404
+                return {"aquarios":[]},200 #se nao tiver aquarios retorna uma lista nula// alteracao que fiz para mostrar a mensagem de erro
             
             if andar and andar != "None" and (predio == 'None' or not predio):
                 return {"erro": "Selecione um prédio"}, 500

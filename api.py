@@ -115,7 +115,7 @@ def get_aquario(id_aquario):
         if not aquarios_cursor:
             return {'error':'aquario não encontrado'}, 404
         else:
-            return {f'aquario {id_aquario}':aquarios_cursor}
+            return aquarios_cursor
         
 
     except Exception as e:

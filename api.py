@@ -53,7 +53,7 @@ def register():
     if not username or not password:
         return {"erro": "Usuário e senha são obrigatórios"}, 400
 
-    collection = db['users']
+    collection = db['usuarios']
     if collection.find_one({"username": username}):
         return {"erro": "Usuário já existe"}, 400
 
@@ -75,7 +75,7 @@ def login():
     if not username or not password:
         return {"erro": "Usuário e senha são obrigatórios"}, 400
 
-    collection = db['users']
+    collection = db['usuarios']
     user = collection.find_one({"username": username})
 
     if not user or not bcrypt.check_password_hash(user['password'], password):

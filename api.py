@@ -47,18 +47,21 @@ def register():
         return {"erro": "Erro ao conectar ao banco de dados"}, 500
 
     data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
+    email = data.get('email').strip()
+    username = data.get('username').strip()
+    password = data.get('password').strip()
 
-    if not username or not password:
-        return {"erro": "Usuário e senha são obrigatórios"}, 400
+    if not username or not password or not email:
+        return {"erro": "Email, usuário e senha são obrigatórios"}, 400
 
-    collection = db['usuarios']
+    collection = db['users']
+    if collection.find_one({"email": email}):
+        return {"erro": "Email já cadastrado"}, 400
     if collection.find_one({"username": username}):
         return {"erro": "Usuário já existe"}, 400
 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-    collection.insert_one({"username": username, "password": hashed_password})
+    collection.insert_one({"email": email, "username": username, "password": hashed_password})
 
     return {"mensagem": "Usuário cadastrado com sucesso"}, 201
 
@@ -69,19 +72,19 @@ def login():
         return {"erro": "Erro ao conectar ao banco de dados"}, 500
 
     data = request.get_json()
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
-    if not username or not password:
+    if not email or not password:
         return {"erro": "Usuário e senha são obrigatórios"}, 400
 
-    collection = db['usuarios']
-    user = collection.find_one({"username": username})
+    collection = db['users']
+    user = collection.find_one({"email": email})
 
     if not user or not bcrypt.check_password_hash(user['password'], password):
         return {"erro": "Usuário ou senha inválidos"}, 401
 
-    access_token = create_access_token(identity=username)
+    access_token = create_access_token(identity=email)
     return {"access_token": access_token}, 200
 
 @app.route('/aquarios', methods=['GET'])

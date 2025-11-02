@@ -147,7 +147,37 @@ def update_ocupacao(id):
     except Exception as e:
         return {"erro": "erro ao atualizar ocupação do aquario {e}"},500    
 
+@app.route('/aquarios/<int:id>/waitlist', methods=['POST'])
+@jwt_required()
+def join_waitlist(id):
+    db = connect_db()
+    if db is None:
+        return {"erro": "Erro ao conectar com o banco de dados"}, 500
 
+    try:
+        collection = db['aquarios']
+        aquario = collection.find_one({"id": id}, {"_id": 0})
+        if not aquario:
+            return {"erro": "Aquário não encontrado"}, 404
+
+        if aquario['ocupacao'] == False:
+            return {"mensagem": "O aquário já está livre"}, 200
+
+        current_user = get_jwt_identity()
+        email = current_user 
+
+        if not email:
+            return {"erro": "Email inválido no token"}, 400
+
+        collection.update_one(
+            {"id": id},
+            {"$addToSet": {"waitlist": email}}
+        )
+
+        return {"mensagem": "Você será avisado quando o aquário estiver livre"}, 200
+
+    except Exception as e:
+        return {"erro": f"Erro ao ativar a notificação: {str(e)}"}, 500
 
 @app.route('/aquarios/filter', methods = ['GET']) #passo os filtros por meio de parametros
 def filter():

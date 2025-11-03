@@ -4,6 +4,7 @@ from flask_jwt_extended import (
     JWTManager, create_access_token, jwt_required, get_jwt_identity
 )
 from flask_bcrypt import Bcrypt
+import requests
 import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -18,7 +19,8 @@ from dotenv import load_dotenv
 # - filter() : filtra os aquarios com base no arg da request 
 
 
-load_dotenv('cred') # aqui carregamos o arquivo .cred temporariamente na sessão
+
+load_dotenv('cred')
 
 mongo_uri = os.getenv('MONGO_URI')  #leitura das credenciais do banco 
 db_name = os.getenv('DB_NAME')
@@ -31,6 +33,50 @@ def connect_db():
     except Exception as e:
         print(f"Erro ao conectar ao MongoDB: {e}")
         return None
+
+#via Twilio Sendgrid
+def send_email(to_email, subject, content):
+    """Envia um email usando a API do SendGrid (Twilio).
+    Requer as variáveis de ambiente SENDGRID_API_KEY e SENDER_EMAIL.
+    Retorna True se a requisição teve sucesso (status 202), False caso contrário.
+    """
+    api_key = os.getenv("SENDGRID_API_KEY")
+    sender = os.getenv("SENDER_EMAIL")
+    if api_key:
+        api_key = api_key.strip()
+    if sender:
+        sender = sender.strip()
+
+    # Validações básicas — evita fazer requisições inválidas para o SendGrid
+    if not api_key or not sender:
+        print(f"SendGrid não configurado corretamente. SENDGRID_API_KEY: {bool(api_key)}, SENDER_EMAIL: {bool(sender)}")
+        return False
+
+    url = "https://api.sendgrid.com/v3/mail/send"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "personalizations": [{
+            "to": [{"email": to_email}],
+            "subject": subject
+        }],
+        "from": {"email": sender},
+        "content": [{"type": "text/plain", "value": content}]
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code in (200, 202):
+            print(f"SendGrid: email para {to_email} aceito (status {response.status_code})")
+            return True
+        else:
+            print(f"SendGrid erro {response.status_code} ao enviar para {to_email}: {response.text}")
+            return False
+    except Exception as e:
+        print(f"Erro ao enviar email via SendGrid: {e}")
+        return False
 
 
 
@@ -125,29 +171,88 @@ def get_aquario(id_aquario):
         return {"erro": f"erro ao encontrar aquario {e}"},500
     
 @app.route('/aquarios/<int:id>', methods = ['PUT'])
-
 def update_ocupacao(id):
     db = connect_db()
     if db is None:
       return {"erro": "Erro ao conectar ao banco de dados"}, 500
     try:
         collection = db['aquarios']
-        aquario = collection.find_one({"id":id}, {"_id": 0})  # procuramos o aquario 
-        
-				# se ele estiver ocupado trocamos para false e se estiver livre trocamos pra true 
-        if aquario['ocupacao'] == True:
-            collection.update_one({"id" : id}, {"$set":{"ocupacao": False}})
-            return {'mensagem':'estado de ocupacao alterado'},200
-        elif aquario['ocupacao'] == False:
-            collection.update_one({"id" : id}, {"$set":{"ocupacao": True}})
-            return {'mensagem':'estado de ocupacao alterado'},200            
+        aquario = collection.find_one({"id": id}, {"_id": 0})  # procuramos o aquario
+
         if not aquario:
-            return {'mensagem':'nenhum aquario encontrado'}, 404
-        
+            return {'mensagem': 'nenhum aquario encontrado'}, 404
+
+        # se ele estiver ocupado trocamos para False e notificamos a waitlist
+        if aquario.get('ocupacao') is True:
+            # setar como livre
+            collection.update_one({"id": id}, {"$set": {"ocupacao": False}})
+
+            # coletar waitlist e normalizar emails
+            waitlist = aquario.get('waitlist') or []
+
+            # enviar email para cada inscrito
+            subject = f"{aquario.get('nome', id)} está livre"
+            content = f"O {aquario.get('nome', id)}, no andar {aquario.get('andar', id)} do {aquario.get('predio', id)} está livre agora."
+
+            successful = []
+            failed = []
+            for to_email in waitlist:
+                ok = send_email(to_email, subject, content)
+                if ok:
+                    successful.append(to_email)
+                else:
+                    failed.append(to_email)
+
+            try:
+                collection.update_one({"id": id}, {"$set": {"waitlist": []}})
+            except Exception as e:
+                print(f"Erro ao limpar waitlist no banco para aquário {id}: {e}")
+
+            mensagem = f"estado de ocupação alterado; {len(successful)} notificações enviadas; {len(failed)} falhas"
+            return {'mensagem': mensagem}, 200
+
+        # se estiver livre, marcar como ocupado
+        elif aquario.get('ocupacao') is False:
+            collection.update_one({"id": id}, {"$set": {"ocupacao": True}})
+            return {'mensagem': 'estado de ocupação alterado'}, 200
+
+        else:
+            return {'mensagem': 'estado de ocupação desconhecido'}, 400
+
     except Exception as e:
-        return {"erro": "erro ao atualizar ocupação do aquario {e}"},500    
+        return {"erro": f"erro ao atualizar ocupação do aquario {e}"}, 500
 
+@app.route('/aquarios/<int:id>/waitlist', methods=['POST'])
+@jwt_required()
+def join_waitlist(id):
+    db = connect_db()
+    if db is None:
+        return {"erro": "Erro ao conectar com o banco de dados"}, 500
 
+    try:
+        collection = db['aquarios']
+        aquario = collection.find_one({"id": id}, {"_id": 0})
+        if not aquario:
+            return {"erro": "Aquário não encontrado"}, 404
+
+        if aquario['ocupacao'] == False:
+            return {"mensagem": "O aquário já está livre"}, 200
+
+        current_user = get_jwt_identity()
+        email = current_user 
+
+        if not email:
+            return {"erro": "Email inválido no token"}, 400
+
+        collection.update_one(
+            {"id": id},
+            {"$addToSet": {"waitlist": email}}
+        )
+
+        return {"mensagem": "Você será avisado quando o aquário estiver livre"}, 200
+
+    except Exception as e:
+        return {"erro": f"Erro ao ativar a notificação: {str(e)}"}, 500
 
 @app.route('/aquarios/filter', methods = ['GET']) #passo os filtros por meio de parametros
 def filter():

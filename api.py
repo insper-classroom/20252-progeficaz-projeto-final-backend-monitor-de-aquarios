@@ -208,13 +208,13 @@ def update_ocupacao(id):
             except Exception as e:
                 print(f"Erro ao limpar waitlist no banco para aquário {id}: {e}")
 
-            mensagem = f"estado de ocupação alterado; {len(successful)} notificações enviadas; {len(failed)} falhas"
+            mensagem = f"aquário foi definido como liberado; {len(successful)} notificações enviadas; {len(failed)} falhas"
             return {'mensagem': mensagem}, 200
 
         # se estiver livre, marcar como ocupado
         elif aquario.get('ocupacao') is False:
             collection.update_one({"id": id}, {"$set": {"ocupacao": True}})
-            return {'mensagem': 'estado de ocupação alterado'}, 200
+            return {'mensagem': 'aquário foi definido como ocupado'}, 200
 
         else:
             return {'mensagem': 'estado de ocupação desconhecido'}, 400

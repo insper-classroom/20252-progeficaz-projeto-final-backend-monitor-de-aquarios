@@ -7,6 +7,3 @@ __pycache__/
 
 # Credenciais do Atlas do MongoDB
 cred
-
-# Ignorar arquivo de variáveis de ambiente
-.env

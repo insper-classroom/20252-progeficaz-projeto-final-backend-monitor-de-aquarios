@@ -109,7 +109,13 @@ def register():
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     collection.insert_one({"email": email, "username": username, "password": hashed_password})
 
-    return {"mensagem": "Usuário cadastrado com sucesso"}, 201
+    # Criar e retornar token de acesso imediatamente para fazer login automático
+    try:
+        access_token = create_access_token(identity=email)
+        return {"mensagem": "Usuário cadastrado com sucesso", "access_token": access_token}, 201
+    except Exception:
+        # Se por algum motivo a geração do token falhar, ainda retornamos sucesso do cadastro
+        return {"mensagem": "Usuário cadastrado com sucesso"}, 201
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -298,52 +304,7 @@ def filter():
         except Exception as e:
             return {"erro": f"Erro ao consultar aquários: {str(e)}"}, 500
 
-@app.route('/favoritos/<string:predio>', methods=['POST'])
-@jwt_required()
-def atualizar_favoritos(predio):
-    db = connect_db()
-    if db is None:
-        return {"erro": "Erro ao conectar com o banco de dados"}, 500
 
-    try:
-        predio = str(predio).strip()
-        if not predio:
-            return {"erro": "Prédio inválido"}, 400
-
-        identity = get_jwt_identity()
-        if not identity:
-            return {"erro": "Token inválido"}, 401
-
-        users = db['users']
-
-        user = users.find_one({"$or": [{"email": identity}, {"username": identity}]})
-        if not user:
-            return {"erro": "Usuário não encontrado"}, 404
-
-        favoritos = user.get("favoritos", [])
-
-        if predio in favoritos:
-            users.update_one(
-                {"_id": user["_id"]},
-                {"$pull": {"favoritos": predio}}
-            )
-            acao = "removido dos"
-        else:
-            users.update_one(
-                {"_id": user["_id"]},
-                {"$addToSet": {"favoritos": predio}}
-            )
-            acao = "adicionado aos"
-
-        user_atualizado = users.find_one({"_id": user["_id"]}, {"_id": 0, "password": 0})
-        favoritos_atualizados = user_atualizado.get("favoritos", [])
-
-        return {
-            "mensagem": f"{predio} {acao} favoritos"
-        }, 200
-
-    except Exception as e:
-        return {"erro": f"Erro ao atualizar favoritos: {str(e)}"}, 500
             
 if __name__ == '__main__':
     app.run(debug=True)

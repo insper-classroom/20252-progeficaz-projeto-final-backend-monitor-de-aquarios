@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import (
-    JWTManager, create_access_token, jwt_required, get_jwt_identity
+    JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 )
+from datetime import datetime, timezone
 from flask_bcrypt import Bcrypt
 import requests
 import os
@@ -86,6 +87,13 @@ bcrypt = Bcrypt(app)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 jwt = JWTManager(app)
 
+revoked_jtis = set()
+
+# loader
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
+    return jwt_payload.get('jti') in revoked_jtis
+
 @app.route('/cadastro', methods=['POST'])
 def register():
     db = connect_db()
@@ -139,6 +147,13 @@ def login():
     access_token = create_access_token(identity=email)
     return {"access_token": access_token}, 200
 
+@app.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    jti = get_jwt().get('jti')
+    revoked_jtis.add(jti)
+    return {"mensagem":"Logout efetuado com sucesso"}, 200
+
 @app.route('/aquarios', methods=['GET'])
 def get_aquarios():
     db = connect_db()
@@ -158,7 +173,6 @@ def get_aquarios():
 
 
 @app.route('/aquarios/<int:id_aquario>', methods = ['GET'])
-
 def get_aquario(id_aquario):
     db = connect_db()
     if db is None:
